@@ -18,9 +18,8 @@ while True:
 
     if play_category == 'Upbit' :
         import os
+        import requests
         upbit_dir=os.path.dirname(os.path.realpath(__file__))+'/UpbitPlay'
-             
-        print(upbit_dir)
         sys.path.append(upbit_dir)
         import UpbitPlay as Upbit
         Upbit.do_work()
