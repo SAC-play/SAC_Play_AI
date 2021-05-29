@@ -26,13 +26,10 @@ def do_work() :
     for a in json_ticker:
         tradePrice = int(a['trade_price'])
 
-    print(coinName + ' 현재 가격 : ' + str(tradePrice) + '원')
+    print(coinName + ' 현재가 : ' + str(tradePrice) + '원')
     # print(json_ticker)
     #계좌 내용 조회 
     accountData = UA.get_my_account_info()
-    # "market" : "KRW-XRP",
-    # "ceiling" : "5",
-    # "floor" : "2"
     buy_sell_execute(coinName, accountData, ceiling, floor, tradePrice)
     CRAW.crawling(accountData)
 # 사고 파는 함수   
@@ -42,11 +39,28 @@ def buy_sell_execute(coinName, accountData, ceiling, floor, tradePrice) :
         for a in accountData:
             if(a['currency']==coinName[coinName.find("-")+1:]):
                 avgBuyPrice=int(a['avg_buy_price'])
-                print('평단가 : ' + str(avgBuyPrice) +', 평단가+5% :' + str(avgBuyPrice+avgBuyPrice*(ceiling/100)))
+                print('평단가    : ' , str(avgBuyPrice))
+                print('평단가+5% : ',str(avgBuyPrice+avgBuyPrice*(ceiling/100)))
+                print('balance   : ', a['balance'])
                 if avgBuyPrice+avgBuyPrice*(ceiling/100) <= tradePrice :
-                    print('평단보다 5% 많아 판매를 진행합니다.') #판매함수 넣기
+                    print('평단보다 '+ceiling+'% 많아 매도를 진행합니다.') #판매함수 넣기
+                    order = {
+                                    'market': coinName,
+                                    'side': 'ask',
+                                    'volume': a['balance'],
+                                    'price': tradePrice*a['balance'],
+                                    'ord_type': 'price',
+                                }
+                    UA.order_bitcoin(order)
                 elif avgBuyPrice-avgBuyPrice*(floor/100) >= tradePrice :
-                    print('평단보다 2% 낮아 판매를 진행합니다.') #판매함수 넣기
+                    print('평단보다 '+floor+'% 낮아 매수를 진행합니다.') #판매함수 넣기
+                    order = {
+                                    'market': coinName,
+                                    'side': 'bid',
+                                    'volume': a[''],
+                                    'price': '100.0',
+                                    'ord_type': 'market',
+                                }
                 else :
                     print('어느 전략에도 도달하지 않았습니다.')
     #전략의 데이터가 계좌에 존재하지 않을 때, 사고 팔기
